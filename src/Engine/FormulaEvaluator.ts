@@ -30,6 +30,7 @@ export class FormulaEvaluator {
     this._errorMessage = "";
     let res: number = 0;
     let operator: string = "+";
+    const decimalRegex = /^[\d.]+$/;
 
     if (len === 0) {
       this._errorOccured = true;
@@ -42,14 +43,14 @@ export class FormulaEvaluator {
       const token: string = formula[i];
 
       // check if it is a decimal number, if so parse it to float
-      if (/^[\d.]+$/.test(token)) { 
+      if (decimalRegex.test(token)) { 
         num = parseFloat(token);
       }
 
       // check if this cell contains reference, if so, get the cell value and error(if has) 
       if (this.isCellReference(token)) {
         let [value, err] = this.getCellValue(token);
-        if (err !== "") {
+        if (err) {
             this._errorMessage = err;
             this._errorOccured = true;
             return 0;
