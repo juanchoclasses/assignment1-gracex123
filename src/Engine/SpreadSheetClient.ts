@@ -17,7 +17,7 @@ import { PortsGlobal } from '../PortsGlobal';
 
 class SpreadSheetClient {
     private _serverPort: number = PortsGlobal.serverPort;
-    private _baseURL: string = `http://pencil.local:${this._serverPort}`;
+    private _baseURL: string = `http://localhost:${this._serverPort}`;
     private _userName: string = 'juancho';
     private _documentName: string = 'test';
     private _document: DocumentTransport;
@@ -63,20 +63,20 @@ class SpreadSheetClient {
         const options = {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "userName": this._userName })
+            body: JSON.stringify({ "userName": this._userName }),
         };
 
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 fetch(url, options)
-                    .then(response => {
+                    .then((response) => {
                         this.getDocument(this._documentName, this._userName);
                         this._timedFetch();
                         resolve(response);
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         reject(error);
                     });
             }, 100);
@@ -105,7 +105,7 @@ class SpreadSheetClient {
         }
         const formula = this._document.formula;
         if (formula) {
-            return formula
+            return formula;
         }
         return '';
     }
@@ -124,7 +124,7 @@ class SpreadSheetClient {
 
     private _getCellValue(cellTransport: CellTransport): string {
         if (cellTransport.error === '') {
-            return cellTransport.value.toString();
+            return String(cellTransport.value);
         } else if (cellTransport.error === ErrorMessages.emptyFormula) {
             return '';
         } else {
@@ -195,11 +195,11 @@ class SpreadSheetClient {
         fetch(requestEditViewURL, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "userName": this._userName })
+            body: JSON.stringify({ "userName": this._userName }),
         })
-            .then(response => {
+            .then((response) => {
                 return response.json() as Promise<DocumentTransport>;
             }).then((document: DocumentTransport) => {
                 this._updateDocument(document);
@@ -209,15 +209,21 @@ class SpreadSheetClient {
 
 
     public addToken(token: string): void {
+        if (token === '/') {
+            token = '%2F';
+        }
+        if (token === '.') {
+            token = '&';
+        }
         const requestAddTokenURL = `${this._baseURL}/document/addtoken/${this._documentName}/${token}`;
         fetch(requestAddTokenURL, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "userName": this._userName })
+            body: JSON.stringify({ "userName": this._userName }),
         })
-            .then(response => {
+            .then((response) => {
 
                 return response.json() as Promise<DocumentTransport>;
             }
@@ -232,11 +238,11 @@ class SpreadSheetClient {
         fetch(requestAddCellURL, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "userName": this._userName })
+            body: JSON.stringify({ "userName": this._userName }),
         })
-            .then(response => {
+            .then((response) => {
                 return response.json() as Promise<DocumentTransport>;
             }
             ).then((document: DocumentTransport) => {
@@ -250,11 +256,11 @@ class SpreadSheetClient {
         fetch(requestRemoveTokenURL, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "userName": this._userName })
+            body: JSON.stringify({ "userName": this._userName }),
         })
-            .then(response => {
+            .then((response) => {
                 return response.json() as Promise<DocumentTransport>;
             }
             ).then((document: DocumentTransport) => {
@@ -266,13 +272,13 @@ class SpreadSheetClient {
         const requestViewURL = `${this._baseURL}/document/cell/view/${this._documentName}/${label}`;
         console.log(this._userName);
         fetch(requestViewURL, {
-            method: 'PUT',
+            method: "PUT",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({ "userName": this._userName })
+            body: JSON.stringify({ "userName": this._userName }),
         })
-            .then(response => {
+            .then((response) => {
                 return response.json() as Promise<DocumentTransport>;
             }).then((document: DocumentTransport) => {
                 this._updateDocument(document);
@@ -280,7 +286,22 @@ class SpreadSheetClient {
     }
 
     public clearFormula(): void {
-        return;
+
+        const requestClearFormulaURL = `${this._baseURL}/document/clear/formula/${this._documentName}`;
+        
+        fetch(requestClearFormulaURL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "userName": this._userName })
+        })
+        .then(response => {
+            return response.json() as Promise<DocumentTransport>;
+            }).then((document: DocumentTransport) => {
+                this._updateDocument(document);
+                });
+        
     }
 
 
@@ -300,11 +321,11 @@ class SpreadSheetClient {
         fetch(fetchURL, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "userName": userName })
+            body: JSON.stringify({ "userName": userName }),
         })
-            .then(response => {
+            .then((response) => {
                 return response.json() as Promise<DocumentTransport>;
             }).then((document: DocumentTransport) => {
                 this._updateDocument(document);
